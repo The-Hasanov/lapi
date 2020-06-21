@@ -1,0 +1,28 @@
+{
+    "name": "the-hasanov/lapi",
+    "description": "RESTful JSON API for the Laravel",
+    "type": "library",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=7.2",
+        "laravel/framework": "^7",
+        "ext-json": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Lapi\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Lapi\\LapiServiceProvider"
+            ]
+        }
+    }
+}
