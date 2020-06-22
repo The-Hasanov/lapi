@@ -8,7 +8,6 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
-use Illuminate\Validation\ValidationException;
 use Lapi\Response\Formatter\ResponseFormatter;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -26,9 +25,9 @@ class ApiResponse implements Responsable, Jsonable, Arrayable
 
     protected $response;
 
-    public function __construct()
+    public function __construct($body = null)
     {
-        $this->body = new Collection();
+        $this->body = new Collection($body ?? []);
     }
 
     public static function addFormatter(ResponseFormatter $formatter)

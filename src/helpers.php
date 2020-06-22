@@ -3,8 +3,8 @@
 use Lapi\Response\ApiResponse;
 
 if (!function_exists('api')) {
-    function api()
+    function api($data = null)
     {
-        return new ApiResponse();
+        return new ApiResponse($data);
     }
 }
