@@ -20,7 +20,6 @@ trait ApiExceptionResponse
             ->toResponse($request);
     }
 
-
     protected function prepareExceptionBody(\Exception $e)
     {
         $exceptionBody = [
