@@ -1,6 +1,6 @@
 <?php
 
-namespace Lapi\Response\Exception;
+namespace Lapi\Response;
 
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Validation\ValidationException;
