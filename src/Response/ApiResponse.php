@@ -8,14 +8,14 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
-use Lapi\Response\Formatter\ResponseFormatter;
+use Lapi\Response\Formatter\ResponseBodyFormatter;
 use Symfony\Component\HttpFoundation\Response;
 
 class ApiResponse implements Responsable, Jsonable, Arrayable
 {
     use Macroable;
     /**
-     * @var ResponseFormatter[]
+     * @var ResponseBodyFormatter[]
      */
     protected static $formatters = [];
 
@@ -30,7 +30,7 @@ class ApiResponse implements Responsable, Jsonable, Arrayable
         $this->body = new Collection($body ?? []);
     }
 
-    public static function addFormatter(ResponseFormatter $formatter)
+    public static function addFormatter(ResponseBodyFormatter $formatter)
     {
         static::$formatters[] = $formatter;
     }
@@ -78,7 +78,7 @@ class ApiResponse implements Responsable, Jsonable, Arrayable
 
     public function getBody(): Collection
     {
-        return $this->body;
+        return $this->body->collect();
     }
 
     public function setBody(Collection $collection): self

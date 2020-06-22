@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Lapi\Response\ApiResponse;
 
-class DebugFormatter implements ResponseFormatter
+class DebugFormatter implements ResponseBodyFormatter
 {
     public function __construct()
     {
