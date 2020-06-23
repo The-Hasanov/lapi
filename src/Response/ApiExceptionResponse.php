@@ -8,7 +8,7 @@ use Illuminate\Validation\ValidationException;
 trait ApiExceptionResponse
 {
 
-    public function render($request, \Exception $e)
+    public function apiExceptionRender($request, \Throwable $e)
     {
         if ($e instanceof Responsable) {
             return $e->toResponse($request);
@@ -20,11 +20,11 @@ trait ApiExceptionResponse
             ->toResponse($request);
     }
 
-    protected function prepareExceptionBody(\Exception $e)
+    protected function prepareExceptionBody(\Throwable $e)
     {
         $exceptionBody = [
             'message'   => $e->getMessage(),
-            'exception' => class_basename(self::class)
+            'exception' => class_basename($e)
         ];
 
         if ($e instanceof ValidationException) {
