@@ -1,7 +1,7 @@
 
 ### TODO
 - [x] Debug response
-- [ ] Data root
+- [x] Data root
 - [ ] Pagination
 - [ ] Filterable Models
 - [ ] Sanctum base Authentication

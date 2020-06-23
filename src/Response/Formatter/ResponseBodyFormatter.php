@@ -7,5 +7,5 @@ use Lapi\Response\ApiResponse;
 
 interface ResponseBodyFormatter
 {
-    public function format(ApiResponse $apiResponse, Collection $body): void;
+    public function format(ApiResponse $apiResponse, Collection $body): Collection;
 }

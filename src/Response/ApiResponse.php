@@ -68,22 +68,65 @@ class ApiResponse implements Responsable, Jsonable, Arrayable
         return $this;
     }
 
+    public function setData($data)
+    {
+        $this->body->put('data', collect($data));
+        return $this;
+    }
+
+    public function setDataWhen($condition, $data)
+    {
+        if ($condition) {
+            $this->setData($data);
+        }
+        return $this;
+    }
+
+    public function mergeWithData($data)
+    {
+        foreach (collect($data) as $index => $value) {
+            $this->getData()->put(is_string($index) ? $index : null, $value);
+        }
+        return $this;
+    }
+
+    public function mergeWithDataWhen($condition, $data): self
+    {
+        if ($condition) {
+            $this->mergeWithData($data);
+        }
+        return $this;
+    }
+
+    public function getData()
+    {
+        return collect($this->body->get('data', []));
+    }
+
     public function mergeWithBody($data): self
     {
-        foreach ($data as $index => $value) {
+        foreach (collect($data) as $index => $value) {
             $this->body->put(is_string($index) ? $index : null, $value);
+        }
+        return $this;
+    }
+
+    public function mergeWithBodyWhen($condition, $data): self
+    {
+        if ($condition) {
+            $this->mergeWithBody($data);
         }
         return $this;
     }
 
     public function getBody(): Collection
     {
-        return $this->body->collect();
+        return collect($this->body);
     }
 
-    public function setBody(Collection $collection): self
+    public function setBody($body): self
     {
-        $this->body = $collection;
+        $this->body = collect($body);
         return $this;
     }
 
@@ -115,7 +158,7 @@ class ApiResponse implements Responsable, Jsonable, Arrayable
     {
         $body = $this->body->collect();
         foreach (static::$formatters as $formatter) {
-            $formatter->format($this, $body);
+            $body = $formatter->format($this, $body);
         }
         return $body;
     }

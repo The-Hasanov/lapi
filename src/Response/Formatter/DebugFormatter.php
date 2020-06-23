@@ -16,12 +16,13 @@ class DebugFormatter implements ResponseBodyFormatter
         });
     }
 
-    public function format(ApiResponse $apiResponse, Collection $body): void
+    public function format(ApiResponse $apiResponse, Collection $body): Collection
     {
         $debug = $apiResponse->debug ?? app('config')->get('app.debug', false);
         if ($debug) {
             $body->put('debug', $this->getDebugInfo());
         }
+        return $body;
     }
 
     public function getDebugInfo(): array
