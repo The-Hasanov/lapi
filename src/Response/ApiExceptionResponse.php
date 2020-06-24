@@ -22,10 +22,18 @@ trait ApiExceptionResponse
 
     protected function prepareExceptionBody(\Throwable $e)
     {
+        $debug = app('config')->get('app.debug', false);
         $exceptionBody = [
             'message'   => $e->getMessage(),
-            'exception' => class_basename($e)
+            'exception' => $debug ? get_class($e) : class_basename($e),
         ];
+
+        if ($debug) {
+            $exceptionBody += [
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ];
+        }
 
         if ($e instanceof ValidationException) {
             $exceptionBody['errors'] = $e->errors();
