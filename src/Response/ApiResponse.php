@@ -6,6 +6,8 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
 use Lapi\Response\Formatter\ResponseBodyFormatter;
@@ -25,12 +27,14 @@ class ApiResponse implements Responsable, Jsonable, Arrayable
 
     protected $response;
 
+    protected $dataResource;
+
     public function __construct($body = null)
     {
         $this->body = new Collection($body ?? []);
     }
 
-    public static function addFormatter(ResponseBodyFormatter $formatter)
+    public static function addFormatter(ResponseBodyFormatter $formatter): void
     {
         static::$formatters[] = $formatter;
     }
@@ -68,13 +72,16 @@ class ApiResponse implements Responsable, Jsonable, Arrayable
         return $this;
     }
 
-    public function setData($data)
+    public function setData($data): self
     {
-        $this->body->put('data', collect($data));
+        $this->body->put('data', collect($this->dataResource
+            ? $this->applyDataResource($data)
+            : $data
+        ));
         return $this;
     }
 
-    public function setDataWhen($condition, $data)
+    public function setDataWhen($condition, $data): self
     {
         if ($condition) {
             $this->setData($data);
@@ -82,10 +89,28 @@ class ApiResponse implements Responsable, Jsonable, Arrayable
         return $this;
     }
 
-    public function mergeWithData($data)
+    public function setPaginatorData(AbstractPaginator $paginator): self
     {
-        foreach (collect($data) as $index => $value) {
-            $this->getData()->put(is_string($index) ? $index : null, $value);
+        $this->body->put('data', $this->applyDataResourceToCollection($paginator->getCollection()));
+
+        if (method_exists($paginator, 'total')) {
+            $this->body->put('total', $paginator->total());
+        }
+        return $this;
+    }
+
+    public function mergeWithData($data): self
+    {
+        $data = $data instanceof AbstractPaginator
+            ? $this->applyDataResourceToCollection($data->getCollection())
+            : collect($this->applyDataResource($data));
+
+        $dataCollection = $this->body->has('data')
+            ? $this->body->get('data')
+            : ($this->body['body'] = collect());
+
+        foreach ($data as $index => $value) {
+            $dataCollection->put(is_string($index) ? $index : null, $value);
         }
         return $this;
     }
@@ -98,7 +123,7 @@ class ApiResponse implements Responsable, Jsonable, Arrayable
         return $this;
     }
 
-    public function getData()
+    public function getData(): Collection
     {
         return collect($this->body->get('data', []));
     }
@@ -130,6 +155,33 @@ class ApiResponse implements Responsable, Jsonable, Arrayable
         return $this;
     }
 
+    public function bindDataResource($resource)
+    {
+        $this->dataResource = $resource instanceof JsonResource
+            ? $resource
+            : app()->makeWith($resource, ['resource' => null]);
+        return $this;
+    }
+
+    protected function applyDataResource($data)
+    {
+        if ($this->dataResource !== null) {
+            $this->dataResource->resource = $data;
+            $data = $this->dataResource->resolve();
+            $this->dataResource->resource = null;
+        }
+        return $data;
+    }
+
+    protected function applyDataResourceToCollection(Collection $collection): Collection
+    {
+        return $this->dataResource === null
+            ? $collection
+            : $collection->map(function ($data) {
+                return $this->applyDataResource($data);
+            });
+    }
+
     public function toResponse($request): Response
     {
         return ($this->buildResponse())
@@ -156,7 +208,7 @@ class ApiResponse implements Responsable, Jsonable, Arrayable
 
     protected function prepareBody(): Collection
     {
-        $body = $this->body->collect();
+        $body = $this->body;
         foreach (static::$formatters as $formatter) {
             $body = $formatter->format($this, $body);
         }

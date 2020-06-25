@@ -11,5 +11,10 @@ return [
         'route'    => true,
         'duration' => true,
         'query'    => false,
-    ]
+    ],
+    /*
+    'order_body'   => [
+
+    ],
+    */
 ];
