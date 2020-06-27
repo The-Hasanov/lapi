@@ -27,4 +27,29 @@ class ApiRequest extends FormRequest
             : [];
     }
 
+    public function page()
+    {
+        return (int)$this->get('page', 1);
+    }
+
+    public function limit()
+    {
+        if ($limit = $this->get('limit')) {
+            return $limit > ($maximumLimit = $this->maximumPaginationLimit())
+                ? $maximumLimit
+                : $limit;
+        }
+        return $this->defaultPaginationLimit();
+    }
+
+    protected function defaultPaginationLimit(): int
+    {
+        return (int)app('config')->get('api.pagination.default_limit', 15);
+    }
+
+    protected function maximumPaginationLimit(): int
+    {
+        return (int)app('config')->get('api.pagination.max_limit', 100);
+    }
+
 }

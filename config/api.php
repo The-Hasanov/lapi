@@ -6,7 +6,12 @@ return [
         //\Lapi\Response\Formatter\OrderBodyFormatter::class,
     ],
     'json_options' => JSON_PRETTY_PRINT,
-    'debug'        => [
+    'pagination'   => [
+        'default_limit' => 15,
+        'max_limit'     => 100,
+    ],
+
+    'debug' => [
         'request'  => true,
         'route'    => true,
         'duration' => true,
