@@ -7,12 +7,9 @@ use Illuminate\Support\Str;
 
 /**
  * @method rulesIndex()
- * @method rulesCreate()
  * @method rulesStore()
  * @method rulesShow()
- * @method rulesEdit()
  * @method rulesUpdate()
- * @method rulesDelete()
  * @method rulesDestroy()
  */
 class ApiRequest extends FormRequest
