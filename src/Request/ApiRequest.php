@@ -24,6 +24,18 @@ class ApiRequest extends FormRequest
             : [];
     }
 
+    public function ruleInputs()
+    {
+        return $this->all($this->normilizeRuleNames(array_keys($this->rules())));
+    }
+
+    private function normilizeRuleNames($names)
+    {
+        return array_map(function ($name) {
+            return current(explode('.', $name));
+        }, $names);
+    }
+
     public function page()
     {
         return (int)$this->get('page', 1);

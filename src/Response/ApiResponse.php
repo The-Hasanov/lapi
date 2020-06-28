@@ -182,6 +182,10 @@ class ApiResponse implements Responsable, Jsonable, Arrayable
             });
     }
 
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @return JsonResponse
+     */
     public function toResponse($request): Response
     {
         return ($this->buildResponse())
