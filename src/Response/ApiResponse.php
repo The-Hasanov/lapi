@@ -89,6 +89,12 @@ class ApiResponse implements Responsable, Jsonable, Arrayable
         return $this;
     }
 
+    public function countData(): self
+    {
+        $this->body->put('total', $this->body->has('data') ? $this->body['data']->count() : 0);
+        return $this;
+    }
+
     public function setPaginatorData(AbstractPaginator $paginator): self
     {
         $this->body->put('data', $this->applyDataResourceToCollection($paginator->getCollection()));
