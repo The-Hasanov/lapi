@@ -3,6 +3,7 @@
 namespace Lapi\Response;
 
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
 
 trait ApiExceptionResponse
@@ -16,7 +17,7 @@ trait ApiExceptionResponse
 
         return api()
             ->mergeWithBody($this->prepareExceptionBody($exception))
-            ->status($this->getExceiptionHttpStatusCode($exception))
+            ->status($this->getExceptionHttpStatusCode($exception))
             ->toResponse($request)
             ->withHeaders($this->getExceptionHttpHeaders($exception));
     }
@@ -25,7 +26,7 @@ trait ApiExceptionResponse
     {
         $debug = app('config')->get('app.debug', false);
         $exceptionBody = [
-            'message'   => $exception->getMessage(),
+            'message'   => $this->getExceptionMessage($exception),
             'exception' => $debug ? get_class($exception) : class_basename($exception),
         ];
 
@@ -42,7 +43,19 @@ trait ApiExceptionResponse
         return $exceptionBody;
     }
 
-    private function getExceiptionHttpStatusCode($exception)
+    private function getExceptionMessage($exception)
+    {
+        if ($message = $exception->getMessage()) {
+            return $message;
+        }
+        if ($httpCode = $this->getExceptionHttpStatusCode($exception)) {
+            return array_key_exists($httpCode, Response::$statusTexts)
+                ? Response::$statusTexts[$httpCode]
+                : Response::$statusTexts[500];
+        }
+    }
+
+    private function getExceptionHttpStatusCode($exception)
     {
         if (method_exists($exception, 'getStatusCode')) {
             return $exception->getStatusCode();
