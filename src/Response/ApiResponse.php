@@ -72,6 +72,14 @@ class ApiResponse implements Responsable, Jsonable, Arrayable
         return $this;
     }
 
+    public function when($condition, \Closure $callback): self
+    {
+        if ($condition) {
+            $callback($this);
+        }
+        return $this;
+    }
+
     public function setData($data): self
     {
         $this->body->put('data', collect($this->dataResource
