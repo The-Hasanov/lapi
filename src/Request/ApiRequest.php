@@ -3,6 +3,7 @@
 namespace Lapi\Request;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 /**
@@ -26,7 +27,7 @@ class ApiRequest extends FormRequest
 
     public function ruleInputs()
     {
-        return $this->all($this->normilizeRuleNames(array_keys($this->rules())));
+        return Arr::only($this->all(), $this->normilizeRuleNames(array_keys($this->rules())));
     }
 
     private function normilizeRuleNames($names)
