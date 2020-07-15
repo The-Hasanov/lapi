@@ -7,7 +7,7 @@
     "prefer-stable": true,
     "require": {
         "php": ">=7.2",
-        "laravel/framework": "^7",
+        "illuminate/support": "^7",
         "ext-json": "*"
     },
     "autoload": {
