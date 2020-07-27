@@ -6,7 +6,6 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
@@ -97,6 +96,14 @@ class ApiResponse implements Responsable, Jsonable, Arrayable
         return $this;
     }
 
+    public function addToData($data)
+    {
+        $this->body->put('data', $this->body->get('data', static function () {
+            return collect();
+        })->put(null, $data));
+        return $this;
+    }
+
     public function countData(): self
     {
         $this->body->put('total', $this->body->has('data') ? $this->body['data']->count() : 0);
@@ -171,7 +178,7 @@ class ApiResponse implements Responsable, Jsonable, Arrayable
 
     public function bindDataResource($resource)
     {
-        $this->dataResource = $resource instanceof JsonResource
+        $this->dataResource = is_object($resource)
             ? $resource
             : app()->makeWith($resource, ['resource' => null]);
         return $this;
