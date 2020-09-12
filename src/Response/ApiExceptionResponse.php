@@ -9,6 +9,14 @@ use Illuminate\Validation\ValidationException;
 trait ApiExceptionResponse
 {
 
+    public function apiExceptionReport(\Throwable $exception)
+    {
+        if ($exception instanceof ApiHttpException && !$exception->shouldReport()) {
+            return;
+        }
+        return parent::report($exception);
+    }
+
     public function apiExceptionRender($request, \Throwable $exception)
     {
         if ($exception instanceof Responsable) {
@@ -18,6 +26,9 @@ trait ApiExceptionResponse
         return api()
             ->mergeWithBody($this->prepareExceptionBody($exception))
             ->status($this->getExceptionHttpStatusCode($exception))
+            ->when($exception instanceof ApiHttpException, function (ApiResponse $apiResponse) use ($exception) {
+                return $apiResponse->mergeWithBody($exception->addition());
+            })
             ->toResponse($request)
             ->withHeaders($this->getExceptionHttpHeaders($exception));
     }
@@ -45,6 +56,9 @@ trait ApiExceptionResponse
 
     private function getExceptionMessage($exception)
     {
+        if ($exception instanceof ApiHttpException) {
+            return $exception->getErrorMessage();
+        }
         if ($message = $exception->getMessage()) {
             return $message;
         }
