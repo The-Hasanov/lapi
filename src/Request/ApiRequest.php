@@ -62,4 +62,14 @@ class ApiRequest extends FormRequest
         return (int)app('config')->get('api.pagination.max_limit', 100);
     }
 
+    public function parameter($parameter = null)
+    {
+        if ($parameter !== null) {
+            return $this->route()->parameter($parameter);
+        }
+        return defined(static::class . '::PARAMETER')
+            ? $this->route()->parameter(static::PARAMETER)
+            : null;
+    }
+
 }
