@@ -18,11 +18,12 @@ class ApiRequest extends FormRequest
 
     public function rules()
     {
-        $action = $this->route() ? $this->route()->getActionMethod() : '';
-
-        return method_exists($this, $methodName = 'rules' . Str::studly($action))
-            ? $this->{$methodName}()
-            : [];
+        if ($this->route() && !empty($action = $this->route()->getActionMethod())) {
+            return method_exists($this, $methodName = 'rules' . Str::studly($action))
+                ? $this->{$methodName}()
+                : [];
+        }
+        return [];
     }
 
     public function ruleInputs()
